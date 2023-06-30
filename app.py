@@ -5,33 +5,40 @@ import subprocess
 import speech_recognition as sr
 from pydub import AudioSegment
 from pydub.utils import make_chunks
+from pydub.silence import split_on_silence
 from yake import KeywordExtractor
+from pydub.effects import normalize
+import noisereduce as nr
+from pydub.silence import split_on_silence
+import librosa
+import numpy as np
+import webrtcvad
+import soundfile as sf
 
 app = Flask(__name__)
 
 language_options = {
-    "English (US)": "en",
-    "English (UK)": "en",
-    "Tamil (India)": "ta",
-    "Telugu (India)": "te",
-    "Hindi (India)": "hi",
-    "French (France)": "fr",
-    "Kannada (India)": "kn"
+    "English (US)": "en-US",
+    "English (UK)": "en-GB",
+    "English (IN)": "en-IN",
+    "Tamil (India)": "ta-IN",
+    "Telugu (India)": "te-IN",
+    "Hindi (India)": "hi-IN",
+    "French (France)": "fr-FR",
+    "Kannada (India)": "kn-IN"
 }
 
 def transcribe_audio(filename, language='en-US'):
     transcriptions = []
-    myaudio = AudioSegment.from_wav(filename)
-    chunks_length = 8000
-    chunks = make_chunks(myaudio, chunks_length)
+    audio = AudioSegment.from_wav(filename)
+    chunks = split_on_silence(audio, min_silence_len=500, silence_thresh=-40, keep_silence=900)
     for i, chunk in enumerate(chunks):
-        chunkName = f"./chunked/{os.path.basename(filename)}_{i}.wav"
-        print(f"I am exporting {chunkName}")
-        chunk.export(chunkName, format="wav")
-        file = chunkName
+        chunk.export(f"./chunked/{i}.wav", format="wav")
+        file = f"./chunked/{i}.wav"
         r = sr.Recognizer()
+
         with sr.AudioFile(file) as source:
-            audio_listened = r.listen(source)
+            audio_listened = r.record(source)
             try:
                 rec = r.recognize_google(audio_listened, language=language)
                 transcriptions.append(rec)
@@ -39,6 +46,7 @@ def transcribe_audio(filename, language='en-US'):
                 print("I don't recognize your audio")
             except sr.RequestError as e:
                 print("Could not get the result.")
+
     transcript = ' '.join(transcriptions)
     return transcript
 

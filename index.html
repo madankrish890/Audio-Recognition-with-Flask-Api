@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Transcription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #222d3c;
+            color: #ffffff;
+        }
+
+        h1 {
+            color: #3498db;
+            text-align: center;
+        }
+
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        select {
+            width: 25%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        select {
+            height: 34px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        h3 {
+            color: #ffffff;
+            margin-top: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Audio Transcription</h1>
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <label>Paste YouTube URL:</label>
+        <input type="text" name="youtube_url" placeholder="Paste YouTube URL">
+        <br>
+        <label>(or)</label>
+        <label>Upload Audio File:</label>
+        <input type="file" name="audio_file" accept="audio/*">
+        <br>
+        <label>Select Language:</label>
+        <select name="language">
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (Uk)</option>
+            <option value="en-IN">English (IN)</option>
+            <option value="ta-IN">Tamil (India)</option>
+            <option value="te-IN">Telugu (India)</option>
+            <option value="hi-IN">Hindi (India)</option>
+            <option value="fr-FR">French (France)</option>
+            <option value="kn-IN">Kannada (India)</option>
+        </select>
+        <br>
+        <input type="submit" value="Transcribe">
+    </form>
+
+    {% if transcription %}
+        <h3>Transcription:</h3>
+        <p>{{ transcription }}</p>
+    {% endif %}
+
+    {% if keywords %}
+        <h3>Keywords:</h3>
+        <ul>
+            {% for keyword in keywords %}
+                <li>{{ keyword }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if error %}
+        <h3 class="error">Error:</h3>
+        <p class="error">{{ error }}</p>
+    {% endif %}
+</body>
+</html>
